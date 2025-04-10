@@ -25,6 +25,12 @@ function App() {
         // You can navigate to signup page or do other logic here
     };
 
+    const handlebookDetailsClick = () => {
+        console.log("bookDetails button clicked");
+        navigate('/bookdetails');
+        // You can navigate to signup page or do other logic here
+    };
+
     return (
         <section className="p-4 max-w-md mx-auto">
             <Button
@@ -44,6 +50,12 @@ function App() {
                 className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
             >
                 Dashboard
+            </Button>
+            <Button
+                onClick={handlebookDetailsClick}
+                className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
+            >
+                BookDetails
             </Button>
         </section>
     );
