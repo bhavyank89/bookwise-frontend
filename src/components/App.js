@@ -1,0 +1,40 @@
+"use client";
+
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+
+function App() {
+    const navigate = useNavigate();
+
+    const handleLoginClick = () => {
+        console.log("Login button clicked");
+        navigate('/login');
+        // You can navigate to login page or do other logic here
+    };
+
+    const handleSignupClick = () => {
+        console.log("Signup button clicked");
+        navigate('/signup');
+        // You can navigate to signup page or do other logic here
+    };
+
+    return (
+        <section className="p-4 max-w-md mx-auto">
+            <Button
+                onClick={handleLoginClick}
+                className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
+            >
+                Login
+            </Button>
+            <Button
+                onClick={handleSignupClick}
+                className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
+            >
+                Signup
+            </Button>
+        </section>
+    );
+}
+
+export default App;
