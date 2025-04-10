@@ -3,6 +3,7 @@
 import Login from "@/components/Login";
 import App from "@/components/App";
 import Signup from "@/components/Signup";
+import Dashboard from "@/components/Dashboard";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
           <Route path="/" element={<App />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </div>
     </Router>
