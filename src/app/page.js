@@ -7,6 +7,7 @@ import Dashboard from "@/components/Dashboard";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import BookDetails from "@/components/BookDetails";
 import SearchPage from "@/components/Search";
+import Profile from "@/components/Profile";
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/bookdetails" element={<BookDetails />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>
