@@ -31,6 +31,12 @@ function App() {
         // You can navigate to signup page or do other logic here
     };
 
+    const handleSearchPageClick = () => {
+        console.log("searchPage button clicked");
+        navigate('/search');
+        // You can navigate to signup page or do other logic here
+    };
+
     return (
         <section className="p-4 max-w-md mx-auto">
             <Button
@@ -56,6 +62,12 @@ function App() {
                 className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
             >
                 BookDetails
+            </Button>
+            <Button
+                onClick={handleSearchPageClick}
+                className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
+            >
+                SearchBook
             </Button>
         </section>
     );
