@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,20 +39,47 @@ function Signup() {
     });
 
     const handleLoginClick = () => {
-        console.log("Login button clicked");
-        navigate('/login');
+        navigate("/login");
     };
 
-    const onSubmit = (values) => {
-        console.log("Submitted:", values);
+    const onSubmit = async (values) => {
+        const payload = {
+            name: values.fullName,
+            email: values.email,
+            uniId: values.universityId,
+            password: values.password,
+        };
+    
+        try {
+            const response = await fetch("http://localhost:4000/auth/createUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+            
+            const json = await response.json();
+    
+            if (json.success) {
+                localStorage.setItem("auth-token", json.token);
+                console.log(json.token)
+                navigate("/dashboard");
+            } else if (json.error?.includes("User already exists")) {
+                console.log("User already exists");
+            } else {
+                console.log("SignUp failed");
+            }
+        } catch (e) {
+            console.error("Error occurred during signup:", e.message);
+        }
     };
+    
 
     return (
         <section className="h-auto flex flex-col md:flex-row items-center justify-between gap-6">
-
             {/* Form Section */}
             <div className="w-full md:w-[60%] max-w-md md:ml-30 bg-[#0d0f17]/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl text-white relative">
-
                 <h1 className="text-2xl font-bold mt-8 text-center">📚 BookWise</h1>
                 <h2 className="text-lg font-semibold mt-2 text-center">
                     Create Your Library Account
@@ -91,8 +118,8 @@ function Signup() {
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="adrian@jsmastery.pro"
                                             type="email"
+                                            placeholder="adrian@jsmastery.pro"
                                             className="bg-[#1e2230] border border-[#2c2f45] text-white placeholder:text-gray-500"
                                             {...field}
                                         />
@@ -111,7 +138,7 @@ function Signup() {
                                     <FormLabel>University ID Number</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="eg: 394365762"
+                                            placeholder="e.g., 394365762"
                                             className="bg-[#1e2230] border border-[#2c2f45] text-white placeholder:text-gray-500"
                                             {...field}
                                         />
@@ -143,11 +170,13 @@ function Signup() {
 
                         {/* File Upload */}
                         <div className="space-y-1">
-                            <FormLabel>Upload University ID Card (file upload)</FormLabel>
+                            <FormLabel>Upload University ID Card (optional)</FormLabel>
                             <input
                                 type="file"
                                 className="w-full file:cursor-pointer bg-[#1e2230] border border-[#2c2f45] text-gray-300 px-4 py-2 rounded-md"
+                                disabled
                             />
+                            <p className="text-xs text-gray-500 italic">File upload not yet handled.</p>
                         </div>
 
                         {/* Submit Button */}
@@ -162,7 +191,7 @@ function Signup() {
 
                 {/* Footer Link */}
                 <div className="text-sm text-gray-400 text-center mt-4">
-                    Have an account already?{" "}
+                    Already have an account?{" "}
                     <Button
                         variant="link"
                         className="text-white font-medium hover:underline px-1"
