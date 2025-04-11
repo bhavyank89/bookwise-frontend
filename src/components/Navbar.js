@@ -36,17 +36,17 @@ function Navbar({ setIsLogin }) {
                 </h1>
             </div>
             <div className="flex text-gray-50 items-center gap-6">
-                <button onClick={() => navigate("/dashboard")}>
+                <button className="hover:cursor-pointer" onClick={() => navigate("/dashboard")}>
                     Home
                 </button>
-                <button onClick={() => navigate("/search")}>
+                <button className="hover:cursor-pointer" onClick={() => navigate("/search")}>
                     Search
                 </button>
                 <button onClick={() => navigate("/profile")} className="flex items-center gap-2">
-                    <div className="bg-white text-black font-semibold px-3 py-1 rounded-full">
+                    <div className="bg-white text-black font-semibold px-3 py-1 rounded-full hover:cursor-pointer">
                         {activeUser?.name ? activeUser.name[0]?.toUpperCase() : "U"}
                     </div>
-                    <span className="font-medium text-gray-50">{activeUser?.name || "User"}</span>
+                    <span className="font-medium hover:cursor-pointer text-gray-50">{activeUser?.name || "User"}</span>
                 </button>
                 <LogoutUser setIsLogin={setIsLogin} />
             </div>
