@@ -39,8 +39,34 @@ function Login() {
         navigate('/signup');
     };
 
-    const onSubmit = (values) => {
+    const onSubmit = async (values) => {
         console.log("Submitted:", values);
+        try {
+            const url = 'http://localhost:4000/auth/login';
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(values)
+            });
+
+            const json = await response.json();
+
+            if (json.success) {
+                localStorage.setItem('auth-token', json.token);
+                navigate("/dashboard");
+            }
+            else if (json.error && json.error.includes("Invalid credentials")) {
+                console.log("Invalid credentials");
+            }
+            else {
+                console.log("SignUp failed!!");
+            }
+
+        } catch (e) {
+            console.log("error occured!!!: ", e.message);
+        }
     };
 
     return (
