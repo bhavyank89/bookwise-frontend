@@ -23,7 +23,7 @@ const formSchema = z.object({
     password: z.string().min(8, { message: "Minimum 8 characters required" }),
 });
 
-function Login() {
+function Login({ setIsLogin }) {
     const navigate = useNavigate();
 
     const form = useForm({
@@ -55,17 +55,18 @@ function Login() {
 
             if (json.success) {
                 localStorage.setItem('auth-token', json.token);
+                setIsLogin(true);
                 navigate("/dashboard");
             }
             else if (json.error && json.error.includes("Invalid credentials")) {
                 console.log("Invalid credentials");
             }
             else {
-                console.log("SignUp failed!!");
+                console.log("Login failed!");
             }
 
         } catch (e) {
-            console.log("error occured!!!: ", e.message);
+            console.log("Error occurred: ", e.message);
         }
     };
 

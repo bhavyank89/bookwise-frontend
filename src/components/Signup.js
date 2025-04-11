@@ -49,7 +49,7 @@ function Signup() {
             uniId: values.universityId,
             password: values.password,
         };
-    
+
         try {
             const response = await fetch("http://localhost:4000/auth/createUser", {
                 method: "POST",
@@ -58,23 +58,21 @@ function Signup() {
                 },
                 body: JSON.stringify(payload),
             });
-            
+
             const json = await response.json();
-    
+
             if (json.success) {
                 localStorage.setItem("auth-token", json.token);
-                console.log(json.token)
-                navigate("/dashboard");
+                navigate("/login");
             } else if (json.error?.includes("User already exists")) {
                 console.log("User already exists");
             } else {
-                console.log("SignUp failed");
+                console.log("Signup failed");
             }
         } catch (e) {
             console.error("Error occurred during signup:", e.message);
         }
     };
-    
 
     return (
         <section className="h-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -85,7 +83,7 @@ function Signup() {
                     Create Your Library Account
                 </h2>
                 <p className="text-sm text-gray-400 text-center mt-1 mb-6">
-                    Please complete all fields and upload a valid university ID to gain access to the library
+                    Please complete all fields and upload a valid university ID to gain access to the library.
                 </p>
 
                 <Form {...form}>
@@ -168,12 +166,12 @@ function Signup() {
                             )}
                         />
 
-                        {/* File Upload */}
+                        {/* File Upload (Not implemented) */}
                         <div className="space-y-1">
                             <FormLabel>Upload University ID Card (optional)</FormLabel>
                             <input
                                 type="file"
-                                className="w-full file:cursor-pointer bg-[#1e2230] border border-[#2c2f45] text-gray-300 px-4 py-2 rounded-md"
+                                className="w-full file:cursor-not-allowed bg-[#1e2230] border border-[#2c2f45] text-gray-300 px-4 py-2 rounded-md"
                                 disabled
                             />
                             <p className="text-xs text-gray-500 italic">File upload not yet handled.</p>
@@ -208,7 +206,7 @@ function Signup() {
                 <img
                     className="w-full h-full object-cover rounded-xl shadow"
                     src="/cover.png"
-                    alt="Login Cover"
+                    alt="Signup Cover"
                 />
             </div>
         </section>

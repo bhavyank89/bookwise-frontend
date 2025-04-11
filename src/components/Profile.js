@@ -43,22 +43,6 @@ const borrowedBooks = [
 const BorrowedBooksPage = () => {
     return (
         <main className="min-h-screen bg-[#0f111c] text-white px-8 py-10 font-sans">
-            {/* Header */}
-            <header className="flex justify-between items-center mb-10">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <BookOpen size={28} className="text-white" /> BookWise
-                </h1>
-                <div className="flex items-center gap-6">
-                    <a href="#" className="hover:underline">Home</a>
-                    <a href="#" className="hover:underline">Search</a>
-                    <div className="flex items-center gap-2">
-                        <div className="bg-white text-black font-semibold px-3 py-1 rounded-full">AH</div>
-                        <span>Adrian</span>
-                    </div>
-                    <button className="text-red-400 text-xl">🚪</button>
-                </div>
-            </header>
-
             <div className="grid md:grid-cols-2 gap-10">
                 {/* Left Card */}
                 <div className="bg-[#1b1e2e] rounded-2xl p-6 w-full max-w-md mx-auto shadow-lg">
