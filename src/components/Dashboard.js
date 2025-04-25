@@ -19,6 +19,7 @@ const Dashboard = () => {
 
                 const json = await response.json();
                 setBooks(json.book || []);
+                console.log('book fetched',json.book);
             } catch (e) {
                 console.error("Error fetching books:", e.message);
             }

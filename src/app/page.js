@@ -10,6 +10,7 @@ import Dashboard from "@/components/Dashboard";
 import BookDetails from "@/components/BookDetails";
 import SearchPage from "@/components/Search";
 import Profile from "@/components/Profile";
+import UploadPDF from "@/components/UploadPDF";
 import Navbar from "@/components/Navbar";
 
 function MainApp() {
@@ -17,7 +18,7 @@ function MainApp() {
 
   return (
     <div className="bg-[url('/background.jpg')] min-h-screen bg-cover bg-no-repeat">
-      {isLogin && <Navbar setIsLogin={setIsLogin}/>}
+      {isLogin && <Navbar setIsLogin={setIsLogin} />}
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login setIsLogin={setIsLogin} />} />
@@ -26,6 +27,7 @@ function MainApp() {
         <Route path="/bookdetails" element={<BookDetails />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/uploadPDF" element={<UploadPDF />} />
       </Routes>
     </div>
   );

@@ -43,6 +43,12 @@ function App() {
         // You can navigate to signup page or do other logic here
     };
 
+    const handleUploadPDF = () => {
+        console.log("uploadPDF button clicked");
+        navigate('/uploadPDF');
+        // You can navigate to signup page or do other logic here
+    };
+
     return (
         <section className="p-4 max-w-md mx-auto">
             <Button
@@ -80,6 +86,12 @@ function App() {
                 className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
             >
                 Profile
+            </Button>
+            <Button
+                onClick={handleUploadPDF}
+                className="w-full bg-[#f5c784] text-black hover:bg-[#f1b65f] mt-2 font-semibold"
+            >
+                uploadPDF
             </Button>
         </section>
     );
