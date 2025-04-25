@@ -22,7 +22,7 @@ const SearchPage = () => {
                 });
 
                 const data = await response.json();
-                setBooks(data.book || []);
+                setBooks(data.books || []);
             } catch (error) {
                 console.error("Error fetching books:", error);
             }

@@ -6,6 +6,7 @@ import { Star } from "lucide-react";
 
 const Dashboard = () => {
     const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -18,10 +19,11 @@ const Dashboard = () => {
                 });
 
                 const json = await response.json();
-                setBooks(json.book || []);
-                console.log('book fetched',json.book);
+                setBooks(json.books || []);
             } catch (e) {
                 console.error("Error fetching books:", e.message);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -33,77 +35,99 @@ const Dashboard = () => {
     return (
         <main className="min-h-screen text-white px-6 py-10 md:px-20">
             {/* Featured Book Section */}
-            {featuredBook && (
-                <section className="flex flex-col md:flex-row justify-between items-start gap-10 mb-16">
-                    <div className="max-w-xl">
-                        <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
-                            Featured Book
-                        </span>
-                        <h2 className="text-4xl font-bold mb-2">
-                            {featuredBook.title || "Untitled"}
-                        </h2>
-                        <p className="mb-2">
-                            By{" "}
-                            <span className="text-[#d1a954] font-medium">
-                                {featuredBook.author || "Unknown"}
-                            </span>{" "}
-                            &nbsp;|&nbsp; Category:{" "}
-                            <span className="text-[#d1a954] font-medium">
-                                {featuredBook.genre || featuredBook.category || "General"}
-                            </span>{" "}
-                            &nbsp;|&nbsp;
-                            <Star className="inline-block w-4 h-4 text-yellow-400" /> 4.5/5
-                        </p>
-                        <p className="text-sm mb-2">
-                            Total books: <strong>{featuredBook.count || 0}</strong> &nbsp;&nbsp;
-                            Available: <strong>{featuredBook.available || 0}</strong>
-                        </p>
-                        <p className="text-gray-400 mb-4">
-                            {featuredBook.summary || "No summary available."}
-                        </p>
-                        <Button className="bg-[#f5c784] hover:bg-[#f1b65f] text-black font-semibold">
-                            📖 Borrow Book Request
-                        </Button>
+            {loading ? (
+                <section className="flex flex-col md:flex-row justify-between items-start gap-10 mb-16 animate-pulse">
+                    <div className="max-w-xl space-y-4">
+                        <div className="bg-gray-700 h-6 w-32 rounded-full"></div>
+                        <div className="bg-gray-700 h-10 w-80 rounded"></div>
+                        <div className="bg-gray-700 h-4 w-64 rounded"></div>
+                        <div className="bg-gray-700 h-4 w-48 rounded"></div>
+                        <div className="bg-gray-700 h-20 w-full rounded"></div>
+                        <div className="bg-gray-600 h-10 w-48 rounded"></div>
                     </div>
-
-                    <div className="w-48 md:w-60 relative">
-                        <img
-                            src={featuredBook.image || "/origin-blue.png"}
-                            alt={featuredBook.title || "Featured Book Cover"}
-                            loading="lazy"
-                            className="relative z-10 rounded-xl shadow-xl"
-                        />
-                        <img
-                            src={featuredBook.image || "/origin-blue.png"}
-                            alt=""
-                            loading="lazy"
-                            className="absolute top-6 left-6 blur-md opacity-30 z-0"
-                        />
-                    </div>
+                    <div className="w-48 md:w-60 h-72 bg-gray-700 rounded-xl shadow-xl"></div>
                 </section>
+            ) : (
+                featuredBook && (
+                    <section className="flex flex-col md:flex-row justify-between items-start gap-10 mb-16">
+                        <div className="max-w-xl">
+                            <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
+                                Featured Book
+                            </span>
+                            <h2 className="text-4xl font-bold mb-2">
+                                {featuredBook.title || "Untitled"}
+                            </h2>
+                            <p className="mb-2">
+                                By{" "}
+                                <span className="text-[#d1a954] font-medium">
+                                    {featuredBook.author || "Unknown"}
+                                </span>{" "}
+                                &nbsp;|&nbsp; Category:{" "}
+                                <span className="text-[#d1a954] font-medium">
+                                    {featuredBook.genre || featuredBook.category || "General"}
+                                </span>{" "}
+                                &nbsp;|&nbsp;
+                                <Star className="inline-block w-4 h-4 text-yellow-400" /> 4.5/5
+                            </p>
+                            <p className="text-sm mb-2">
+                                Total books: <strong>{featuredBook.count || 0}</strong> &nbsp;&nbsp;
+                                Available: <strong>{featuredBook.available || 0}</strong>
+                            </p>
+                            <p className="text-gray-400 mb-4">
+                                {featuredBook.summary || "No summary available."}
+                            </p>
+                            <Button className="bg-[#f5c784] hover:bg-[#f1b65f] text-black font-semibold">
+                                📖 Borrow Book Request
+                            </Button>
+                        </div>
+
+                        <div className="w-48 md:w-60 relative">
+                            <img
+                                src={featuredBook.thumbnailCloudinary?.secure_url || "/origin-blue.png"}
+                                alt={featuredBook.title || "Featured Book Cover"}
+                                loading="lazy"
+                                className="relative z-10 rounded-xl shadow-xl"
+                            />
+                            <img
+                                src={featuredBook.thumbnailCloudinary?.secure_url || "/origin-blue.png"}
+                                alt=""
+                                loading="lazy"
+                                className="absolute top-6 left-6 blur-md opacity-30 z-0"
+                            />
+                        </div>
+                    </section>
+                )
             )}
 
             {/* Popular Books Section */}
             <section>
                 <h3 className="text-xl font-semibold mb-6">Popular Books</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    {books.map((book, index) => (
-                        <div key={book._id || index} className="text-center">
-                            <img
-                                src={book.image || "/fury.png"}
-                                alt={`Cover of ${book.title || "book"}`}
-                                loading="lazy"
-                                className="w-full h-40 object-cover rounded-md shadow"
-                            />
-                            <p className="mt-2 font-medium text-sm truncate">
-                                {book.title || "Untitled"} -{" "}
-                                <span className="text-yellow-300">{book.author || "Unknown"}</span>
-                            </p>
-                            <p className="text-[#5e6475] text-xs">
-                                {book.genre || book.category || "Uncategorized"}
-                            </p>
-                        </div>
-                    ))}
+                    {loading
+                        ? Array.from({ length: 6 }).map((_, i) => (
+                              <div key={i} className="animate-pulse text-center space-y-2">
+                                  <div className="w-full h-40 bg-gray-700 rounded-md shadow"></div>
+                                  <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto"></div>
+                                  <div className="h-3 bg-gray-600 rounded w-1/2 mx-auto"></div>
+                              </div>
+                          ))
+                        : books.map((book, index) => (
+                              <div key={book._id || index} className="text-center">
+                                  <img
+                                      src={book.thumbnailCloudinary?.secure_url || "/fury.png"}
+                                      alt={`Cover of ${book.title || "book"}`}
+                                      loading="lazy"
+                                      className="w-full h-40 object-cover rounded-md shadow"
+                                  />
+                                  <p className="mt-2 font-medium text-sm truncate">
+                                      {book.title || "Untitled"} -{" "}
+                                      <span className="text-yellow-300">{book.author || "Unknown"}</span>
+                                  </p>
+                                  <p className="text-[#5e6475] text-xs">
+                                      {book.genre || book.category || "Uncategorized"}
+                                  </p>
+                              </div>
+                          ))}
                 </div>
             </section>
         </main>
