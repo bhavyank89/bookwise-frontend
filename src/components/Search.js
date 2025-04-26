@@ -4,16 +4,21 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton"; // Add Skeleton import
 
 const SearchPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [books, setBooks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true); // Loading state
     const itemsPerPage = 6;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
+                setLoading(true); // Set loading to true when fetching books
                 const response = await fetch("http://localhost:4000/book/fetchall", {
                     method: "GET",
                     headers: {
@@ -25,6 +30,8 @@ const SearchPage = () => {
                 setBooks(data.books || []);
             } catch (error) {
                 console.error("Error fetching books:", error);
+            } finally {
+                setLoading(false); // Set loading to false once fetch is done
             }
         };
 
@@ -35,6 +42,11 @@ const SearchPage = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(1); // Reset to first page on new search
     };
+
+    const handleBookClick = (book_id) => {
+        navigate(`/bookDetails/${book_id}`, { state: { fromDashboard: true } });
+    };
+
 
     const filteredBooks = books.filter((book) =>
         book.title?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -81,16 +93,28 @@ const SearchPage = () => {
                 )}
 
                 {/* Books Grid */}
-                {paginatedBooks.length > 0 ? (
+                {loading ? (
+                    // Loading Skeleton
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10 mt-8">
+                        {[...Array(itemsPerPage)].map((_, index) => (
+                            <div key={index} className="bg-[#1c1f2c] p-4 rounded-xl shadow-md">
+                                <Skeleton height={192} className="rounded-lg mb-3" />
+                                <Skeleton width="60%" height={24} className="mb-2" />
+                                <Skeleton width="40%" height={20} />
+                            </div>
+                        ))}
+                    </div>
+                ) : paginatedBooks.length > 0 ? (
                     <>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10 mt-8">
                             {paginatedBooks.map((book) => (
                                 <div
+                                    onClick={() => handleBookClick(book._id)}
                                     key={book._id}
                                     className="bg-[#1c1f2c] p-4 rounded-xl hover:scale-105 transition-transform duration-200 shadow-md"
                                 >
                                     <img
-                                        src={book.image || "/fury.png"}
+                                        src={book.thumbnailCloudinary?.secure_url || "/fury.png"} // Using Cloudinary thumbnail
                                         alt={book.title || "Book cover"}
                                         className="rounded-lg w-full object-cover h-48 mb-3"
                                     />
