@@ -3,10 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -32,8 +36,18 @@ const Dashboard = () => {
 
     const featuredBook = books.length > 0 ? books[0] : null;
 
+    const handleBookClick = (book_id) => {
+        navigate(`/bookDetails/${book_id}`, { state: { fromDashboard: true } });
+    };
+
     return (
-        <main className="min-h-screen text-white px-6 py-10 md:px-20">
+        <motion.main
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="min-h-screen text-white px-6 py-10 md:px-20"
+        >
             {/* Featured Book Section */}
             {loading ? (
                 <section className="flex flex-col md:flex-row justify-between items-start gap-10 mb-16 animate-pulse">
@@ -54,7 +68,10 @@ const Dashboard = () => {
                             <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
                                 Featured Book
                             </span>
-                            <h2 className="text-4xl font-bold mb-2">
+                            <h2
+                                className="text-4xl font-bold mb-2 cursor-pointer"
+                                onClick={() => handleBookClick(featuredBook._id)}
+                            >
                                 {featuredBook.title || "Untitled"}
                             </h2>
                             <p className="mb-2">
@@ -81,7 +98,7 @@ const Dashboard = () => {
                             </Button>
                         </div>
 
-                        <div className="w-48 md:w-60 relative">
+                        <div className="w-48 md:w-60 relative cursor-pointer" onClick={() => handleBookClick(featuredBook._id)}>
                             <img
                                 src={featuredBook.thumbnailCloudinary?.secure_url || "/origin-blue.png"}
                                 alt={featuredBook.title || "Featured Book Cover"}
@@ -105,32 +122,35 @@ const Dashboard = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                     {loading
                         ? Array.from({ length: 6 }).map((_, i) => (
-                              <div key={i} className="animate-pulse text-center space-y-2">
-                                  <div className="w-full h-40 bg-gray-700 rounded-md shadow"></div>
-                                  <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto"></div>
-                                  <div className="h-3 bg-gray-600 rounded w-1/2 mx-auto"></div>
-                              </div>
-                          ))
+                            <div key={i} className="animate-pulse text-center space-y-2">
+                                <div className="w-full h-40 bg-gray-700 rounded-md shadow"></div>
+                                <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto"></div>
+                                <div className="h-3 bg-gray-600 rounded w-1/2 mx-auto"></div>
+                            </div>
+                        ))
                         : books.map((book, index) => (
-                              <div key={book._id || index} className="text-center">
-                                  <img
-                                      src={book.thumbnailCloudinary?.secure_url || "/fury.png"}
-                                      alt={`Cover of ${book.title || "book"}`}
-                                      loading="lazy"
-                                      className="w-full h-40 object-cover rounded-md shadow"
-                                  />
-                                  <p className="mt-2 font-medium text-sm truncate">
-                                      {book.title || "Untitled"} -{" "}
-                                      <span className="text-yellow-300">{book.author || "Unknown"}</span>
-                                  </p>
-                                  <p className="text-[#5e6475] text-xs">
-                                      {book.genre || book.category || "Uncategorized"}
-                                  </p>
-                              </div>
-                          ))}
+                            <motion.div
+                                whileHover={{ scale: 1.05, y: -5 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                                key={book._id || index}
+                                className="text-center cursor-pointer bg-[#1a1a1a] p-3 rounded-lg shadow-md hover:shadow-lg"
+                                onClick={() => handleBookClick(book._id)}
+                            >
+                                <img
+                                    src={book.thumbnailCloudinary?.secure_url || "/fury.png"}
+                                    alt={`Cover of ${book.title || "book"}`}
+                                    loading="lazy"
+                                    className="w-full h-40 object-cover rounded-md"
+                                />
+                                <div className="mt-2">
+                                    <p className="font-semibold text-sm truncate text-white">{book.title || "Untitled"}</p>
+                                    <p className="text-gray-400 text-xs mt-1 truncate">{book.author || "Unknown"}</p>
+                                </div>
+                            </motion.div>
+                        ))}
                 </div>
             </section>
-        </main>
+        </motion.main>
     );
 };
 
