@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import PopularBooks from "./PopularBooks"; // Import the PopularBooks component
 
 const Dashboard = () => {
     const [books, setBooks] = useState([]);
@@ -42,9 +43,9 @@ const Dashboard = () => {
 
     return (
         <motion.main
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.4 }}
             className="min-h-screen text-white px-6 py-10 md:px-20"
         >
@@ -64,7 +65,8 @@ const Dashboard = () => {
             ) : (
                 featuredBook && (
                     <section className="flex flex-col md:flex-row justify-between items-start gap-10 mb-16">
-                        <div className="max-w-xl">
+                        {/* Book Information */}
+                        <div className="max-w-[450px]">
                             <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold inline-block mb-4">
                                 Featured Book
                             </span>
@@ -88,7 +90,7 @@ const Dashboard = () => {
                             </p>
                             <p className="text-sm mb-2">
                                 Total books: <strong>{featuredBook.count || 0}</strong> &nbsp;&nbsp;
-                                Available: <strong>{featuredBook.available || 0}</strong>
+                                Available books: <strong>{featuredBook.available || 0}</strong>
                             </p>
                             <p className="text-gray-400 mb-4">
                                 {featuredBook.summary || "No summary available."}
@@ -98,18 +100,27 @@ const Dashboard = () => {
                             </Button>
                         </div>
 
-                        <div className="w-48 md:w-60 relative cursor-pointer" onClick={() => handleBookClick(featuredBook._id)}>
+                        {/* Book Image */}
+                        <div className="group relative w-[276px] h-[385px] mx-auto">
                             <img
+                                onClick={() => handleBookClick(featuredBook._id)}
                                 src={featuredBook.thumbnailCloudinary?.secure_url || "/origin-blue.png"}
                                 alt={featuredBook.title || "Featured Book Cover"}
-                                loading="lazy"
-                                className="relative z-10 rounded-xl shadow-xl"
+                                className="absolute top-0 left-0 w-[276px] h-[385px] rounded-xl object-cover z-10 transition-transform duration-500 ease-in-out group-hover:-translate-y-2 hover:cursor-pointer"
+                                style={{
+                                    filter: "drop-shadow(-50px 4px 50px rgba(0, 0, 0, 0.5))",
+                                    transform: "perspective(1000px) rotateY(-15deg) rotateX(5deg)",
+                                    transformStyle: "preserve-3d",
+                                }}
                             />
                             <img
                                 src={featuredBook.thumbnailCloudinary?.secure_url || "/origin-blue.png"}
-                                alt=""
-                                loading="lazy"
-                                className="absolute top-6 left-6 blur-md opacity-30 z-0"
+                                alt="Blurred Featured Book Cover"
+                                className="absolute top-1 left-6 w-[276px] h-[385px] rounded-xl blur-sm opacity-80 z-0 transition-transform duration-500 ease-in-out group-hover:-translate-y-1"
+                                style={{
+                                    transform: "rotate(5.23deg) perspective(1000px) rotateY(-10deg) rotateX(2deg)",
+                                    transformStyle: "preserve-3d",
+                                }}
                             />
                         </div>
                     </section>
@@ -117,39 +128,7 @@ const Dashboard = () => {
             )}
 
             {/* Popular Books Section */}
-            <section>
-                <h3 className="text-xl font-semibold mb-6">Popular Books</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    {loading
-                        ? Array.from({ length: 6 }).map((_, i) => (
-                            <div key={i} className="animate-pulse text-center space-y-2">
-                                <div className="w-full h-40 bg-gray-700 rounded-md shadow"></div>
-                                <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto"></div>
-                                <div className="h-3 bg-gray-600 rounded w-1/2 mx-auto"></div>
-                            </div>
-                        ))
-                        : books.map((book, index) => (
-                            <motion.div
-                                whileHover={{ scale: 1.05, y: -5 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                                key={book._id || index}
-                                className="text-center cursor-pointer bg-[#1a1a1a] p-3 rounded-lg shadow-md hover:shadow-lg"
-                                onClick={() => handleBookClick(book._id)}
-                            >
-                                <img
-                                    src={book.thumbnailCloudinary?.secure_url || "/fury.png"}
-                                    alt={`Cover of ${book.title || "book"}`}
-                                    loading="lazy"
-                                    className="w-full h-40 object-cover rounded-md"
-                                />
-                                <div className="mt-2">
-                                    <p className="font-semibold text-sm truncate text-white">{book.title || "Untitled"}</p>
-                                    <p className="text-gray-400 text-xs mt-1 truncate">{book.author || "Unknown"}</p>
-                                </div>
-                            </motion.div>
-                        ))}
-                </div>
-            </section>
+            <PopularBooks loading={loading} books={books} handleBookClick={handleBookClick} />
         </motion.main>
     );
 };
