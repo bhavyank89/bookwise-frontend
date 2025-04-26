@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -27,6 +27,20 @@ const formSchema = z.object({
 
 function Signup() {
     const navigate = useNavigate();
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [universityIDFile, setUniversityIDFile] = useState(null);
+
+    const handleAvatarChange = (e) => {
+        setAvatarFile(e.target.files[0]);
+    };
+
+    const handleUniversityIDChange = (e) => {
+        setUniversityIDFile(e.target.files[0]);
+    };
+
+    const handleLoginClick = () => {
+        navigate("/login");
+    };
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -38,25 +52,24 @@ function Signup() {
         },
     });
 
-    const handleLoginClick = () => {
-        navigate("/login");
-    };
-
     const onSubmit = async (values) => {
-        const payload = {
-            name: values.fullName,
-            email: values.email,
-            uniId: values.universityId,
-            password: values.password,
-        };
+        if (!avatarFile || !universityIDFile) {
+            console.log("Please upload both Avatar and University ID files");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", values.fullName);
+        formData.append("email", values.email);
+        formData.append("uniId", values.universityId);
+        formData.append("password", values.password);
+        formData.append("avatar", avatarFile);
+        formData.append("universityID", universityIDFile);
 
         try {
             const response = await fetch("http://localhost:4000/auth/createUser", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
+                body: formData,
             });
 
             const json = await response.json();
@@ -166,15 +179,32 @@ function Signup() {
                             )}
                         />
 
-                        {/* File Upload (Not implemented) */}
+                        {/* Avatar upload */}
                         <div className="space-y-1">
-                            <FormLabel>Upload University ID Card (optional)</FormLabel>
-                            <input
+                            <FormLabel>Upload Avatar</FormLabel>
+                            <Input
                                 type="file"
-                                className="w-full file:cursor-not-allowed bg-[#1e2230] border border-[#2c2f45] text-gray-300 px-4 py-2 rounded-md"
-                                disabled
+                                accept="image/*"
+                                onChange={handleAvatarChange}
+                                className="bg-[#1e2230] border border-[#2c2f45]"
                             />
-                            <p className="text-xs text-gray-500 italic">File upload not yet handled.</p>
+                            {avatarFile && (
+                                <p className="text-xs text-green-400 mt-1">Selected: {avatarFile.name}</p>
+                            )}
+                        </div>
+
+                        {/* University ID upload */}
+                        <div className="space-y-1">
+                            <FormLabel>Upload University ID</FormLabel>
+                            <Input
+                                type="file"
+                                accept="image/*,application/pdf"
+                                onChange={handleUniversityIDChange}
+                                className="bg-[#1e2230] border border-[#2c2f45]"
+                            />
+                            {universityIDFile && (
+                                <p className="text-xs text-green-400 mt-1">Selected: {universityIDFile.name}</p>
+                            )}
                         </div>
 
                         {/* Submit Button */}
