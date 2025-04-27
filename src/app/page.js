@@ -16,11 +16,12 @@ import { AnimatePresence } from "framer-motion";
 
 function MainApp() {
   const [isLogin, setIsLogin] = useState(false);
+  const [activeUser, setActiveUser] = useState({});
   const location = useLocation();
 
   return (
     <div className="bg-[url('/background.jpg')] min-h-screen bg-cover bg-no-repeat">
-      {isLogin && <Navbar setIsLogin={setIsLogin} />}
+      {isLogin && <Navbar setIsLogin={setIsLogin} setActiveUser={setActiveUser} activeUser={activeUser}/>}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<App />} />

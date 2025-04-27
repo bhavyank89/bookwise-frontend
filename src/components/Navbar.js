@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import LogoutUser from "./LogoutUser";
 
-function Navbar({ setIsLogin }) {
-    const [activeUser, setActiveUser] = useState({});
+function Navbar({ setIsLogin, activeUser, setActiveUser }) {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,7 +25,7 @@ function Navbar({ setIsLogin }) {
         };
 
         fetchUser();
-    }, []);
+    }, [activeUser]);
 
     return (
         <header className="flex justify-between items-center p-10 mb-10 px-4 md:px-10">

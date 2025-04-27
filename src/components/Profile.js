@@ -1,12 +1,22 @@
 "use client";
 
-import { CalendarDays, Undo2, Clock } from "lucide-react";
+import { CalendarDays, Undo2, Clock, Edit } from "lucide-react"; // Add Edit icon
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion"; // For animations
 
 const BorrowedBooksPage = () => {
     const [activeUser, setActiveUser] = useState({});
     const [borrowedBooks, setBorrowedBooks] = useState([]);
-    const [loading, setLoading] = useState(true); // Track loading state
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false); // For Modal
+    const [userData, setUserData] = useState({
+        avatar: '',
+        name: '',
+        email: '',
+        uniId: '',
+        avatarFile: null, // To hold file for avatar
+        uniIdFile: null // To hold file for university ID
+    });
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -21,15 +31,78 @@ const BorrowedBooksPage = () => {
                 const json = await res.json();
                 setActiveUser(json);
                 setBorrowedBooks(json.books || []);
-                setLoading(false); // Set loading to false after data is fetched
+                setLoading(false);
             } catch (err) {
                 console.error("Error fetching user:", err);
-                setLoading(false); // Set loading to false in case of an error
+                setLoading(false);
             }
         };
 
         fetchUser();
     }, []);
+
+    const handleOpenModal = () => {
+        setUserData({
+            avatar: activeUser.avatar?.[0]?.path || '',
+            name: activeUser.name || '',
+            email: activeUser.email || '',
+            uniId: activeUser.uniId || '',
+            avatarFile: null,
+            uniIdFile: null
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+        if (name === 'avatar') {
+            setUserData({ ...userData, avatarFile: files[0] });
+        } else if (name === 'uniId') {
+            setUserData({ ...userData, uniIdFile: files[0] });
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setUserData({ ...userData, [name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('name', userData.name);
+        formData.append('email', userData.email);
+        formData.append('uniId', userData.uniId);
+        if (userData.avatarFile) formData.append('avatar', userData.avatarFile);
+        if (userData.uniIdFile) formData.append('uniIdFile', userData.uniIdFile);
+
+        try {
+            const res = await fetch("http://localhost:4000/auth/updateuser", {
+                method: "POST",
+                headers: {
+                    "auth-token": localStorage.getItem("auth-token"),
+                },
+                body: formData
+            });
+
+            const json = await res.json();
+
+            if (json.success) {
+                setActiveUser(json.updatedUser);
+                setIsModalOpen(false);
+            } else {
+                console.error("Error updating user", json.message);
+            }
+        } catch (err) {
+            console.error("Error submitting form", err);
+        }
+    };
+
 
     return (
         <main className="min-h-screen text-white px-8 py-10 font-sans">
@@ -50,18 +123,25 @@ const BorrowedBooksPage = () => {
                             <div className="w-full h-48 bg-gray-700 rounded-lg"></div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-4 items-center text-center">
-                            <div className="flex flex-col items-center">
+                        <div className="grid grid-cols-3 gap-2 p-0 items-center text-center">
+                            <div className="flex flex-col col-span-1 items-center">
                                 <img
                                     src={activeUser?.avatar?.[0]?.path || "/fury.png"}
                                     alt="Profile"
                                     className="w-24 h-24 rounded-full object-cover border-4 border-[#2c3145]"
                                 />
-                                <p className="text-sm text-green-400 mt-2">
-                                    {activeUser?.isVerified ? "✔ Verified Student" : "Verification Pending..."}
-                                </p>
                             </div>
-                            <div className="flex flex-col justify-center items-start">
+                            <div className="flex flex-col col-span-2 justify-between items-start">
+                                <p className="text-sm text-green-400 mb-2 flex flex-row justify-between mt-2 items-baseline">
+                                    {activeUser?.isVerified ? "✔ Verified Student" : "Verification Pending..."}
+                                    <span className="ml-auto">
+                                        <button onClick={handleOpenModal} className="text-sm text-blue-400 mt-2">
+                                            <Edit size={20} />
+                                        </button>
+                                    </span>
+                                </p>
+
+
                                 <p className="text-sm text-gray-400 mt-1">
                                     <span className="font-semibold text-white mr-2">Name:</span> {activeUser?.name || "Student"}
                                 </p>
@@ -76,7 +156,6 @@ const BorrowedBooksPage = () => {
                     )}
 
                     <div className="mt-6 w-full h-auto">
-                        {/* Skeleton Loader for University ID */}
                         {loading ? (
                             <div className="w-full h-48 bg-gray-700 rounded-lg"></div>
                         ) : (
@@ -94,7 +173,6 @@ const BorrowedBooksPage = () => {
                     <h2 className="text-xl font-semibold mb-4">Borrowed Books</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {loading ? (
-                            // Skeleton loader for books list
                             <div className="grid gap-4">
                                 {Array.from({ length: 4 }).map((_, index) => (
                                     <div
@@ -146,6 +224,88 @@ const BorrowedBooksPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal for Editing Profile */}
+            {isModalOpen && (
+                <motion.div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div className="bg-[#1b1e2e] rounded-lg p-6 w-96 shadow-lg animate__animated animate__fadeIn">
+                        <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+                        {loading ? (
+                            <div className="space-y-4 animate-pulse">
+                                <div className="h-6 bg-gray-700 rounded w-full"></div>
+                                <div className="h-6 bg-gray-700 rounded w-full"></div>
+                                <div className="h-6 bg-gray-700 rounded w-full"></div>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-300">Name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={userData.name}
+                                        onChange={handleChange}
+                                        className="mt-2 px-4 py-2 w-full rounded-lg bg-[#2c3145] border border-[#444]"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-300">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={userData.email}
+                                        onChange={handleChange}
+                                        className="mt-2 px-4 py-2 w-full rounded-lg bg-[#2c3145] border border-[#444]"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-300">University ID</label>
+                                    <input
+                                        type="text"
+                                        name="uniId"
+                                        value={userData.uniId}
+                                        onChange={handleChange}
+                                        className="mt-2 px-4 py-2 w-full rounded-lg bg-[#2c3145] border border-[#444]"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-300">Avatar</label>
+                                    <input
+                                        type="file"
+                                        name="avatar"
+                                        onChange={handleFileChange}
+                                        className="mt-2 px-4 py-2 w-full rounded-lg bg-[#2c3145] border border-[#444]"
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-300">University ID Document</label>
+                                    <input
+                                        type="file"
+                                        name="uniId"
+                                        onChange={handleFileChange}
+                                        className="mt-2 px-4 py-2 w-full rounded-lg bg-[#2c3145] border border-[#444]"
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white">
+                                        Close
+                                    </button>
+                                    <button type="submit" className="bg-blue-500 px-4 py-2 rounded-lg text-white">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+
         </main>
     );
 };
