@@ -42,12 +42,25 @@ function Navbar({ setIsLogin }) {
                 <button className="hover:cursor-pointer" onClick={() => navigate("/search")}>
                     Search
                 </button>
-                <button onClick={() => navigate("/profile")} className="flex items-center gap-2">
-                    <div className="bg-white text-black font-semibold px-3 py-1 rounded-full hover:cursor-pointer">
-                        {activeUser?.name ? activeUser.name[0]?.toUpperCase() : "U"}
-                    </div>
-                    <span className="font-medium hover:cursor-pointer text-gray-50">{activeUser?.name || "User"}</span>
+
+                <button onClick={() => navigate("/profile")} className="flex items-center gap-2 hover:cursor-pointer">
+                    {/* Avatar if exists, else fallback initial */}
+                    {activeUser?.avatar?.[0]?.path ? (
+                        <img
+                            src={activeUser.avatar[0].path}
+                            alt="User Avatar"
+                            className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                        />
+                    ) : (
+                        <div className="bg-white text-black font-semibold px-3 py-1 rounded-full">
+                            {activeUser?.name ? activeUser.name[0]?.toUpperCase() : "U"}
+                        </div>
+                    )}
+                    <span className="font-medium hover:cursor-pointer text-gray-50">
+                        {activeUser?.name || "User"}
+                    </span>
                 </button>
+
                 <LogoutUser setIsLogin={setIsLogin} />
             </div>
         </header>
