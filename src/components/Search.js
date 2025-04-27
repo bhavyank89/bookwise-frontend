@@ -5,33 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Skeleton from "react-loading-skeleton"; // Add Skeleton import
+import Skeleton from "react-loading-skeleton";
+import { motion } from "framer-motion";
 
 const SearchPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [books, setBooks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
     const itemsPerPage = 6;
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                setLoading(true); // Set loading to true when fetching books
+                setLoading(true);
                 const response = await fetch("http://localhost:4000/book/fetchall", {
                     method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                 });
-
                 const data = await response.json();
                 setBooks(data.books || []);
             } catch (error) {
                 console.error("Error fetching books:", error);
             } finally {
-                setLoading(false); // Set loading to false once fetch is done
+                setLoading(false);
             }
         };
 
@@ -40,13 +38,12 @@ const SearchPage = () => {
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1); // Reset to first page on new search
+        setCurrentPage(1);
     };
 
     const handleBookClick = (book_id) => {
         navigate(`/bookDetails/${book_id}`, { state: { fromDashboard: true } });
     };
-
 
     const filteredBooks = books.filter((book) =>
         book.title?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -60,18 +57,28 @@ const SearchPage = () => {
         <main className="min-h-screen text-white px-6 py-10 md:px-20">
             <section className="min-h-screen px-4 md:px-8 py-12 text-white font-sans">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col items-center justify-center text-center mb-10 space-y-2">
+                    <motion.div
+                        className="flex flex-col items-center justify-center text-center mb-10 space-y-2"
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
                         <h2 className="text-base text-gray-400 tracking-widest">
                             DISCOVER YOUR NEXT GREAT READ:
                         </h2>
                         <h1 className="text-4xl md:text-5xl font-extrabold">
                             Explore and Search for <span className="text-yellow-400">Any Book</span> In Our Library
                         </h1>
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Search Input */}
-                <div className="flex items-center gap-4 justify-center mt-6 mb-4 flex-wrap">
+                <motion.div
+                    className="flex items-center gap-4 justify-center mt-6 mb-4 flex-wrap"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                >
                     <div className="relative w-full max-w-xl">
                         <label htmlFor="search" className="sr-only">Search Books</label>
                         <Input
@@ -83,18 +90,22 @@ const SearchPage = () => {
                         />
                         <Search className="absolute left-4 top-4 text-gray-400" size={22} />
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Search result header */}
                 {searchTerm && (
-                    <div className="mt-10 text-xl font-medium text-center">
+                    <motion.div
+                        className="mt-10 text-xl font-medium text-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                    >
                         Search Results for <span className="text-yellow-400">{searchTerm}</span>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Books Grid */}
                 {loading ? (
-                    // Loading Skeleton
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10 mt-8">
                         {[...Array(itemsPerPage)].map((_, index) => (
                             <div key={index} className="bg-[#1c1f2c] p-4 rounded-xl shadow-md">
@@ -105,46 +116,42 @@ const SearchPage = () => {
                         ))}
                     </div>
                 ) : paginatedBooks.length > 0 ? (
-                    <>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10 mt-8">
-                            {paginatedBooks.map((book) => (
-                                <div
-                                    onClick={() => handleBookClick(book._id)}
-                                    key={book._id}
-                                    className="bg-[#1c1f2c] p-4 rounded-xl hover:scale-105 transition-transform duration-200 shadow-md"
-                                >
-                                    <img
-                                        src={book.thumbnailCloudinary?.secure_url || "/fury.png"} // Using Cloudinary thumbnail
-                                        alt={book.title || "Book cover"}
-                                        className="rounded-lg w-full object-cover h-48 mb-3"
-                                    />
-                                    <div className="text-sm font-semibold truncate">{book.title || "Untitled"}</div>
-                                    <div className="text-xs text-gray-400">{book.genre || book.category || "Unknown Genre"}</div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Pagination */}
-                        <div className="flex justify-center mt-10 gap-3 flex-wrap">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <Button
-                                    key={page}
-                                    size="sm"
-                                    variant={page === currentPage ? "default" : "ghost"}
-                                    className={`rounded-lg px-4 py-2 ${page === currentPage
-                                        ? "bg-yellow-400 text-black"
-                                        : "bg-[#2a2d40] hover:bg-[#3a3e55] text-white"
-                                        }`}
-                                    onClick={() => setCurrentPage(page)}
-                                >
-                                    {page}
-                                </Button>
-                            ))}
-                        </div>
-                    </>
+                    <motion.div
+                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-10 mt-8"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: {},
+                            visible: {
+                                transition: { staggerChildren: 0.1 },
+                            },
+                        }}
+                    >
+                        {paginatedBooks.map((book) => (
+                            <motion.div
+                                key={book._id}
+                                onClick={() => handleBookClick(book._id)}
+                                className="bg-[#1c1f2c] p-4 rounded-xl hover:scale-105 transition-transform duration-200 shadow-md cursor-pointer"
+                                whileHover={{ scale: 1.05 }}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <img
+                                    src={book.thumbnailCloudinary?.secure_url || "/fury.png"}
+                                    alt={book.title || "Book cover"}
+                                    className="rounded-lg w-full object-cover h-48 mb-3"
+                                />
+                                <div className="text-sm font-semibold truncate">{book.title || "Untitled"}</div>
+                                <div className="text-xs text-gray-400">{book.genre || book.category || "Unknown Genre"}</div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 ) : (
-                    // No Results Found
-                    <div className="flex flex-col items-center justify-center mt-20 space-y-6">
+                    <motion.div
+                        className="flex flex-col items-center justify-center mt-20 space-y-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
                         <div className="bg-[#242837] p-6 rounded-full shadow-md">
                             <AlertCircle className="text-yellow-400" size={48} />
                         </div>
@@ -158,7 +165,31 @@ const SearchPage = () => {
                         >
                             Clear Search
                         </Button>
-                    </div>
+                    </motion.div>
+                )}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <motion.div
+                        className="flex justify-center mt-10 gap-3 flex-wrap"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                    >
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <Button
+                                key={page}
+                                size="sm"
+                                variant={page === currentPage ? "default" : "ghost"}
+                                className={`rounded-lg px-4 py-2 ${page === currentPage
+                                    ? "bg-yellow-400 text-black"
+                                    : "bg-[#2a2d40] hover:bg-[#3a3e55] text-white"
+                                    }`}
+                                onClick={() => setCurrentPage(page)}
+                            >
+                                {page}
+                            </Button>
+                        ))}
+                    </motion.div>
                 )}
             </section>
         </main>
