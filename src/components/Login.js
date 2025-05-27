@@ -55,6 +55,8 @@ function Login({ setIsLogin }) {
 
             if (json.success) {
                 localStorage.setItem('auth-token', json.token);
+                console.log("Login successful!");
+                console.log("Token:", json.token);
                 setIsLogin(true);
                 navigate("/dashboard");
             }
